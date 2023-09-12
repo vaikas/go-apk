@@ -268,6 +268,12 @@ func (p *PkgResolver) GetPackagesWithDependencies(ctx context.Context, packages 
 	)
 	// first get the explicitly named packages
 	for _, pkgName := range packages {
+		// If this is explicitly marked as a constraint, then add it to the
+		// conflicts right away:
+		if strings.HasPrefix(pkgName, "!") {
+			conflicts = append(conflicts, pkgName[1:])
+			continue
+		}
 		pkgs, err := p.ResolvePackage(pkgName)
 		if err != nil {
 			return nil, nil, err
