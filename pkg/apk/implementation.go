@@ -446,6 +446,13 @@ func (a *APK) ResolveWorld(ctx context.Context) (toInstall []*repository.Reposit
 		return
 	}
 	a.logger.Debugf("got %d packages to install:\n%s", len(toInstall), strings.Join(packageRefs(toInstall), "\n"))
+	a.logger.Debugf("got %d conflicts :\n%s", len(conflicts), strings.Join(conflicts, "\n"))
+	for _, ti := range toInstall {
+		if ti.Name == "neon" {
+			a.logger.Debugf("DAFUCK!!!: %+v", ti)
+
+		}
+	}
 	return
 }
 

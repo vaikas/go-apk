@@ -286,6 +286,13 @@ func (p *PkgResolver) GetPackagesWithDependencies(ctx context.Context, packages 
 	}
 	// now get the dependencies for each package
 	for _, pkgName := range packages {
+		// If this is explicitly marked as a constraint, then add it to the
+		// conflicts right away:
+		if strings.HasPrefix(pkgName, "!") {
+			conflicts = append(conflicts, pkgName[1:])
+			continue
+		}
+
 		pkg, deps, confs, err := p.GetPackageWithDependencies(pkgName, dependenciesMap)
 		if err != nil {
 			return nil, nil, err
@@ -310,6 +317,7 @@ func (p *PkgResolver) GetPackagesWithDependencies(ctx context.Context, packages 
 	}
 
 	conflicts = uniqify(conflicts)
+	fmt.Printf("CONFLICTS: %v\n", conflicts)
 
 	return toInstall, conflicts, nil
 }
@@ -340,6 +348,7 @@ func (p *PkgResolver) GetPackageWithDependencies(pkgName string, existing map[st
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
 	// eliminate duplication in dependencies
 	added := make(map[string]*repository.RepositoryPackage, len(deps))
 	dependencies := make([]*repository.RepositoryPackage, 0, len(deps))
